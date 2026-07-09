@@ -1,0 +1,16 @@
+{
+  "name": "censo-guilda-ia",
+  "version": "1.0.0",
+  "description": "Censo da Guilda de IA da ARVORE - formulario que grava respostas no Google Sheets",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "googleapis": "^140.0.1"
+  }
+}

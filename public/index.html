@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Censo da Guilda de IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0620;
+    --bg-card: #140b33;
+    --purple: #3900BF;
+    --purple-soft: #6b4fe0;
+    --magenta: #FF009E;
+    --cyan: #00E1FF;
+    --lavender: #EEEFFF;
+    --white: #FFFFFF;
+    --muted: #a9a3d1;
+    --line: rgba(238,239,255,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(circle at 15% 0%, #1c0f52 0%, var(--bg) 55%) fixed;
+    color: var(--lavender);
+    font-family: 'Open Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .page{
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 28px 20px 80px;
+  }
+  /* progress */
+  .progress-wrap{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(180deg, var(--bg) 70%, transparent);
+    padding: 10px 0 14px;
+    margin: -28px -20px 18px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .progress-track{
+    position: relative;
+    height: 6px;
+    border-radius: 6px;
+    background: rgba(238,239,255,0.1);
+    overflow: visible;
+  }
+  .progress-fill{
+    height: 100%;
+    border-radius: 6px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta));
+    transition: width .4s ease;
+  }
+  .progress-leaf{
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(-50%,-50%);
+    font-size: 15px;
+    transition: left .4s ease;
+    filter: drop-shadow(0 0 6px rgba(0,225,255,0.6));
+  }
+  .progress-label{
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  header{ margin-bottom: 34px; }
+  .eyebrow{
+    color: var(--cyan);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+  h1{
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 34px;
+    line-height: 1.15;
+    margin: 0 0 14px;
+    color: var(--white);
+  }
+  header p{
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--lavender);
+    margin: 0;
+    max-width: 520px;
+  }
+  header p + p{ margin-top: 10px; color: var(--muted); font-size: 14px; }
+
+  .card{
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px 22px 24px;
+    margin-bottom: 16px;
+  }
+  .card h2{
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+    margin: 0 0 4px;
+  }
+  .card .hint{
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 0 0 16px;
+  }
+  .req-tag{
+    display:inline-block;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--magenta);
+    letter-spacing: .06em;
+    margin-left: 6px;
+  }
+
+  .field-row{ display:flex; gap: 12px; flex-wrap: wrap; margin-bottom: 4px;}
+  .field{ flex: 1 1 220px; }
+  label.small{
+    display:block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  input[type="text"], textarea{
+    width: 100%;
+    background: rgba(238,239,255,0.05);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 11px 13px;
+    color: var(--white);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14.5px;
+    outline: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  input[type="text"]:focus, textarea:focus{
+    border-color: var(--cyan);
+    background: rgba(0,225,255,0.06);
+  }
+  textarea{ min-height: 76px; resize: vertical; }
+
+  .chips{ display:flex; flex-wrap: wrap; gap: 10px; }
+  .chip{
+    appearance: none;
+    border: 1px solid var(--line);
+    background: rgba(238,239,255,0.04);
+    color: var(--lavender);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 10px 15px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .chip:hover{ border-color: var(--cyan); }
+  .chip:focus-visible{ outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .chip.active{
+    background: linear-gradient(90deg, var(--purple), var(--magenta));
+    border-color: transparent;
+    color: var(--white);
+  }
+  .chip .sub{
+    display:block;
+    font-weight: 400;
+    font-size: 11.5px;
+    opacity: .8;
+    margin-top: 2px;
+  }
+
+  .submit-row{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 26px;
+  }
+  button.primary{
+    appearance: none;
+    border: none;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta));
+    color: #0a0620;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 14px 34px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+    box-shadow: 0 8px 24px rgba(255,0,158,0.25);
+  }
+  button.primary:hover{ transform: translateY(-1px); }
+  button.primary:disabled{
+    opacity: .45; cursor: not-allowed; box-shadow: none; transform:none;
+  }
+  button.ghost{
+    appearance: none;
+    background: none;
+    border: none;
+    color: var(--cyan);
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 4px;
+  }
+  .error-msg{
+    font-size: 13px;
+    color: var(--magenta);
+    text-align: center;
+    min-height: 18px;
+  }
+
+  /* thanks + results */
+  .panel{ text-align:center; padding: 60px 10px 20px; }
+  .panel .big-emoji{ font-size: 44px; margin-bottom: 14px; }
+  .panel h2{
+    font-family:'Poppins', sans-serif; font-size: 26px; color: var(--white); margin: 0 0 10px;
+  }
+  .panel p{ color: var(--muted); font-size: 14.5px; line-height:1.5; max-width: 420px; margin: 0 auto 22px;}
+  .panel-actions{ display:flex; gap: 14px; justify-content:center; flex-wrap: wrap; }
+
+  .results h2.title{
+    font-family:'Poppins', sans-serif; font-size: 24px; color: var(--white); margin: 0 0 4px;
+  }
+  .results .total{ color: var(--muted); font-size: 13.5px; margin-bottom: 26px; }
+  .bar-row{ margin-bottom: 14px; }
+  .bar-row .label{
+    display:flex; justify-content: space-between; font-size: 13px; color: var(--lavender); margin-bottom: 5px;
+  }
+  .bar-row .label span.count{ color: var(--muted); font-weight: 600; }
+  .bar-track{
+    height: 9px; border-radius: 6px; background: rgba(238,239,255,0.08); overflow:hidden;
+  }
+  .bar-fill{
+    height: 100%; border-radius: 6px;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta));
+  }
+  .free-list{ margin: 0; padding: 0; list-style: none; }
+  .free-list li{
+    background: rgba(238,239,255,0.05);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    color: var(--lavender);
+  }
+  .empty-note{ font-size: 13px; color: var(--muted); font-style: italic; }
+  .loading-note{ text-align:center; color: var(--muted); font-size: 13.5px; padding: 40px 0;}
+
+  footer.credit{
+    text-align:center; margin-top: 40px; font-size: 11.5px; color: var(--muted); opacity: .6;
+  }
+  [hidden]{ display:none !important; }
+
+  @media (prefers-reduced-motion: reduce){
+    .progress-fill, .progress-leaf, button.primary{ transition:none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+      <div class="progress-leaf" id="progressLeaf">🌱</div>
+    </div>
+    <div class="progress-label" id="progressLabel">0% respondido</div>
+  </div>
+
+  <div id="formView">
+    <header>
+      <p class="eyebrow">GUILDA DE IA</p>
+      <h1>Quem Somos e Onde Estamos</h1>
+      <p>Leva 2 minutinhos. Não é ranking, não é prova — é só pra gente entender melhor quem tá na guilda e organizar as próximas sessões do jeito certo pra cada nível.</p>
+      <p>Só o nível e o "quer aprender" são obrigatórios. O resto é bônus.</p>
+    </header>
+
+    <div id="censoForm">
+
+      <div class="card">
+        <h2>Sobre você</h2>
+        <p class="hint">Tudo opcional — pode deixar em branco se preferir.</p>
+        <div class="field-row">
+          <div class="field">
+            <label class="small" for="name">Como te chamamos?</label>
+            <input type="text" id="name" placeholder="Seu nome ou apelido">
+          </div>
+          <div class="field">
+            <label class="small" for="area">Time / área</label>
+            <input type="text" id="area" placeholder="Ex: Fábula Rasa, Arte, PMO...">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Seu nível com IA hoje<span class="req-tag">OBRIGATÓRIO</span></h2>
+        <p class="hint">Sem certo ou errado — só onde você tá agora.</p>
+        <div class="chips" id="chipsLevel">
+          <button type="button" class="chip" data-group="level" data-value="Ainda não comecei">Ainda não comecei</button>
+          <button type="button" class="chip" data-group="level" data-value="Uso pra tarefas simples">Uso pra tarefas simples</button>
+          <button type="button" class="chip" data-group="level" data-value="Uso no dia a dia do trabalho">Uso no dia a dia do trabalho</button>
+          <button type="button" class="chip" data-group="level" data-value="Já crio fluxos e automações">Já crio fluxos e automações</button>
+          <button type="button" class="chip" data-group="level" data-value="Já rodo agentes / algo avançado">Já rodo agentes / algo avançado</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>O que você já usa</h2>
+        <p class="hint">Marque quantos quiser.</p>
+        <div class="chips" id="chipsTools">
+          <button type="button" class="chip" data-group="tools" data-value="ChatGPT">ChatGPT</button>
+          <button type="button" class="chip" data-group="tools" data-value="Claude">Claude</button>
+          <button type="button" class="chip" data-group="tools" data-value="Gemini">Gemini</button>
+          <button type="button" class="chip" data-group="tools" data-value="M365 Copilot">M365 Copilot</button>
+          <button type="button" class="chip" data-group="tools" data-value="Perplexity">Perplexity</button>
+          <button type="button" class="chip" data-group="tools" data-value="Nenhuma ainda">Nenhuma ainda</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>O que você mais quer aprender<span class="req-tag">OBRIGATÓRIO</span></h2>
+        <p class="hint">Isso vira o tema das próximas sessões.</p>
+        <div class="chips" id="chipsFocus">
+          <button type="button" class="chip" data-group="focus" data-value="Pensar e pesquisar">Pensar & pesquisar
+            <span class="sub">decidir, planejar, validar</span>
+          </button>
+          <button type="button" class="chip" data-group="focus" data-value="Criar entregáveis">Criar entregáveis
+            <span class="sub">visuais, docs, apps simples</span>
+          </button>
+          <button type="button" class="chip" data-group="focus" data-value="Executar e automatizar">Executar & automatizar
+            <span class="sub">agentes, fluxos, escala</span>
+          </button>
+          <button type="button" class="chip" data-group="focus" data-value="Ainda não sei, quero o básico">Ainda não sei, quero o básico</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Seu objetivo na guilda</h2>
+        <div class="chips" id="chipsGoal">
+          <button type="button" class="chip" data-group="goal" data-value="Aprender do zero">Aprender do zero</button>
+          <button type="button" class="chip" data-group="goal" data-value="Aplicar no meu projeto">Aplicar no meu projeto</button>
+          <button type="button" class="chip" data-group="goal" data-value="Compartilhar o que já sei">Compartilhar o que já sei</button>
+          <button type="button" class="chip" data-group="goal" data-value="Só acompanhar as novidades">Só acompanhar as novidades</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Espaço livre</h2>
+        <div class="field-row">
+          <div class="field" style="flex-basis:100%;">
+            <label class="small" for="blocker">Tem algo que te trava ou dá ansiedade com IA?</label>
+            <textarea id="blocker" placeholder="Sem julgamento, é só pra gente calibrar a linguagem das sessões"></textarea>
+          </div>
+        </div>
+        <div class="field-row" style="margin-top:14px;">
+          <div class="field" style="flex-basis:100%;">
+            <label class="small" for="suggestion">Sugestão de tema pra próxima sessão</label>
+            <textarea id="suggestion" placeholder="Se tiver alguma ideia, solta aqui"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="submit-row">
+        <button type="button" class="primary" id="submitBtn">Enviar respostas</button>
+        <div class="error-msg" id="errorMsg"></div>
+        <button type="button" class="ghost" id="viewResultsLink">Já respondeu? Ver resultados agregados</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="thanksView" class="panel" hidden>
+    <div class="big-emoji">🌳</div>
+    <h2>Valeu por responder!</h2>
+    <p>Isso ajuda a guilda a crescer sem deixar ninguém pra trás. As próximas sessões vão levar isso em conta.</p>
+    <div class="panel-actions">
+      <button type="button" class="primary" id="goResultsBtn">Ver resultados agregados</button>
+    </div>
+  </div>
+
+  <div id="resultsView" class="results" hidden>
+    <h2 class="title">Resultados agregados</h2>
+    <div class="total" id="resultsTotal"></div>
+    <div id="resultsBody"></div>
+    <div class="panel-actions" style="margin-top:28px;">
+      <button type="button" class="ghost" id="exportBtn">Exportar respostas (CSV)</button>
+      <button type="button" class="ghost" id="backToFormBtn">Voltar pro formulário</button>
+    </div>
+  </div>
+
+  <footer class="credit">Guilda de IA · ARVORE · respostas visíveis só pra quem tem acesso a este link</footer>
+</div>
+
+<script>
+(function(){
+  const state = { level: null, focus: null, goal: null, tools: new Set() };
+  const REQUIRED = ['level', 'focus'];
+  let lastResponses = [];
+
+  const chipGroups = document.querySelectorAll('.chips');
+  chipGroups.forEach(group => {
+    group.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const g = chip.dataset.group;
+        const v = chip.dataset.value;
+        if (g === 'tools') {
+          if (state.tools.has(v)) { state.tools.delete(v); chip.classList.remove('active'); }
+          else { state.tools.add(v); chip.classList.add('active'); }
+        } else {
+          const isActive = chip.classList.contains('active');
+          group.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          if (!isActive) {
+            chip.classList.add('active');
+            state[g] = v;
+          } else {
+            state[g] = null;
+          }
+        }
+        updateProgress();
+      });
+    });
+  });
+
+  const nameEl = document.getElementById('name');
+  const areaEl = document.getElementById('area');
+  const blockerEl = document.getElementById('blocker');
+  const suggestionEl = document.getElementById('suggestion');
+  [nameEl, areaEl, blockerEl, suggestionEl].forEach(el => el.addEventListener('input', updateProgress));
+
+  const progressFill = document.getElementById('progressFill');
+  const progressLeaf = document.getElementById('progressLeaf');
+  const progressLabel = document.getElementById('progressLabel');
+
+  function updateProgress(){
+    const fields = [
+      !!state.level, !!state.focus, !!state.goal, state.tools.size > 0,
+      !!nameEl.value.trim(), !!areaEl.value.trim(),
+      !!blockerEl.value.trim(), !!suggestionEl.value.trim()
+    ];
+    const filled = fields.filter(Boolean).length;
+    const pct = Math.min(100, Math.round((filled / fields.length) * 100));
+    progressFill.style.width = pct + '%';
+    progressLeaf.style.left = pct + '%';
+    progressLabel.textContent = pct + '% respondido';
+  }
+
+  const errorMsg = document.getElementById('errorMsg');
+  const submitBtn = document.getElementById('submitBtn');
+
+  submitBtn.addEventListener('click', async (e) => {
+    errorMsg.textContent = '';
+    const missing = REQUIRED.filter(k => !state[k]);
+    if (missing.length > 0) {
+      errorMsg.textContent = 'Falta escolher: nível com IA e/ou o que quer aprender.';
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+
+    const payload = {
+      name: nameEl.value.trim(),
+      area: areaEl.value.trim(),
+      level: state.level,
+      tools: Array.from(state.tools),
+      focus: state.focus,
+      goal: state.goal,
+      blocker: blockerEl.value.trim(),
+      suggestion: suggestionEl.value.trim(),
+      ts: Date.now()
+    };
+
+    const key = 'censo:' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+
+    try {
+      const resp = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) {
+        errorMsg.textContent = 'Não deu pra salvar agora. Tenta de novo em alguns segundos.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar respostas';
+        return;
+      }
+      showView('thanks');
+    } catch (err) {
+      console.error('Erro ao salvar censo:', err);
+      errorMsg.textContent = 'Não deu pra salvar agora. Tenta de novo em alguns segundos.';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enviar respostas';
+    }
+  });
+
+  function showView(name){
+    document.getElementById('formView').hidden = name !== 'form';
+    document.getElementById('thanksView').hidden = name !== 'thanks';
+    document.getElementById('resultsView').hidden = name !== 'results';
+    if (name === 'results') loadResults();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  document.getElementById('viewResultsLink').addEventListener('click', () => showView('results'));
+  document.getElementById('goResultsBtn').addEventListener('click', () => showView('results'));
+  document.getElementById('backToFormBtn').addEventListener('click', () => showView('form'));
+  document.getElementById('exportBtn').addEventListener('click', exportCsv);
+
+  function exportCsv(){
+    if (!lastResponses || lastResponses.length === 0) {
+      alert('Ainda não há respostas pra exportar.');
+      return;
+    }
+    const cols = ['name','area','level','tools','focus','goal','blocker','suggestion','ts'];
+    const escapeCsv = (v) => {
+      const s = (v === undefined || v === null) ? '' : String(v);
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
+    const header = cols.join(',');
+    const rows = lastResponses.map(r => cols.map(c => {
+      if (c === 'tools') return escapeCsv((r.tools || []).join('; '));
+      if (c === 'ts') return escapeCsv(r.ts ? new Date(r.ts).toLocaleString('pt-BR') : '');
+      return escapeCsv(r[c]);
+    }).join(','));
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'censo_guilda_ia.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  async function loadResults(){
+    const total = document.getElementById('resultsTotal');
+    const body = document.getElementById('resultsBody');
+    body.innerHTML = '<div class="loading-note">Carregando respostas...</div>';
+    total.textContent = '';
+
+    let responses = [];
+    try {
+      const resp = await fetch('/api/results');
+      if (!resp.ok) throw new Error('bad status');
+      responses = await resp.json();
+    } catch (err) {
+      console.error('Erro ao carregar respostas:', err);
+      body.innerHTML = '<div class="empty-note">Não deu pra carregar os resultados agora.</div>';
+      return;
+    }
+
+    if (responses.length === 0) {
+      total.textContent = '0 respostas até agora';
+      body.innerHTML = '<div class="empty-note">Ninguém respondeu ainda. Manda o link no #guild_ia!</div>';
+      return;
+    }
+
+    total.textContent = responses.length + (responses.length === 1 ? ' resposta até agora' : ' respostas até agora');
+    lastResponses = responses;
+
+    const levelOrder = ['Ainda não comecei', 'Uso pra tarefas simples', 'Uso no dia a dia do trabalho', 'Já crio fluxos e automações', 'Já rodo agentes / algo avançado'];
+    const focusOrder = ['Pensar e pesquisar', 'Criar entregáveis', 'Executar e automatizar', 'Ainda não sei, quero o básico'];
+    const goalOrder = ['Aprender do zero', 'Aplicar no meu projeto', 'Compartilhar o que já sei', 'Só acompanhar as novidades'];
+
+    function tally(items, order, key){
+      const counts = {};
+      order.forEach(o => counts[o] = 0);
+      items.forEach(it => {
+        const v = it[key];
+        if (v) counts[v] = (counts[v] || 0) + 1;
+      });
+      return counts;
+    }
+
+    function tallyTools(items){
+      const counts = {};
+      items.forEach(it => (it.tools || []).forEach(t => counts[t] = (counts[t] || 0) + 1));
+      return counts;
+    }
+
+    function renderBars(title, counts){
+      const max = Math.max(1, ...Object.values(counts));
+      const rows = Object.entries(counts)
+        .sort((a,b) => b[1]-a[1])
+        .map(([label, count]) => `
+          <div class="bar-row">
+            <div class="label"><span>${escapeHtml(label)}</span><span class="count">${count}</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${(count/max*100)}%"></div></div>
+          </div>`).join('');
+      return `<h2 style="font-family:'Poppins',sans-serif;font-size:15px;color:#fff;margin:22px 0 12px;">${title}</h2>${rows}`;
+    }
+
+    function renderFreeText(title, items, key){
+      const texts = items.map(it => it[key]).filter(t => t && t.trim());
+      if (texts.length === 0) {
+        return `<h2 style="font-family:'Poppins',sans-serif;font-size:15px;color:#fff;margin:22px 0 12px;">${title}</h2><div class="empty-note">Nenhuma resposta ainda por aqui.</div>`;
+      }
+      const items_html = texts.map(t => `<li>${escapeHtml(t)}</li>`).join('');
+      return `<h2 style="font-family:'Poppins',sans-serif;font-size:15px;color:#fff;margin:22px 0 12px;">${title}</h2><ul class="free-list">${items_html}</ul>`;
+    }
+
+    function escapeHtml(str){
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    let html = '';
+    html += renderBars('Nível com IA hoje', tally(responses, levelOrder, 'level'));
+    html += renderBars('O que mais quer aprender', tally(responses, focusOrder, 'focus'));
+    html += renderBars('Objetivo na guilda', tally(responses, goalOrder, 'goal'));
+    html += renderBars('Ferramentas já em uso', tallyTools(responses));
+    html += renderFreeText('O que trava ou dá ansiedade', responses, 'blocker');
+    html += renderFreeText('Sugestões de tema', responses, 'suggestion');
+
+    body.innerHTML = html;
+  }
+
+  updateProgress();
+})();
+</script>
+</body>
+</html>
