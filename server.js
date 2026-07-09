@@ -8,10 +8,23 @@ const PORT = process.env.PORT || 3000;
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_TAB = process.env.GOOGLE_SHEET_TAB || 'Respostas';
 const SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-// Private key comes from an env var, so newlines are usually escaped as \n — restore them here.
-const SERVICE_ACCOUNT_KEY = (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+// Prefer a base64-encoded key (GOOGLE_PRIVATE_KEY_B64) — avoids newline-escaping
+// issues some platforms introduce when storing multi-line env vars.
+// Falls back to GOOGLE_PRIVATE_KEY with literal \n replaced by real newlines.
+const SERVICE_ACCOUNT_KEY = process.env.GOOGLE_PRIVATE_KEY_B64
+  ? Buffer.from(process.env.GOOGLE_PRIVATE_KEY_B64, 'base64').toString('utf8')
+  : (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
 
 const COLUMNS = ['ts', 'name', 'area', 'level', 'tools', 'focus', 'goal', 'blocker', 'suggestion'];
+
+// Sanity check at boot — never logs the key itself, only whether its shape looks right.
+if (SERVICE_ACCOUNT_KEY) {
+  const looksValid = SERVICE_ACCOUNT_KEY.includes('-----BEGIN PRIVATE KEY-----') &&
+    SERVICE_ACCOUNT_KEY.includes('-----END PRIVATE KEY-----');
+  console.log(`Verificação da chave da service account: ${looksValid ? 'formato OK' : 'FORMATO INVÁLIDO — confira GOOGLE_PRIVATE_KEY_B64 / GOOGLE_PRIVATE_KEY'}`);
+} else {
+  console.log('Aviso: nenhuma credencial de service account configurada ainda.');
+}
 
 let sheetsClient = null;
 function getSheetsClient() {

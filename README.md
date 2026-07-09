@@ -29,10 +29,30 @@ link normal, sem depender de sessão no Claude.ai.
    "Criar nova chave" → formato **JSON**. Isso baixa um arquivo `.json`.
 6. Abra o arquivo baixado — você vai precisar de dois campos dele:
    - `client_email` → vira `GOOGLE_SERVICE_ACCOUNT_EMAIL`
-   - `private_key` → vira `GOOGLE_PRIVATE_KEY`
+   - `private_key` → vira `GOOGLE_PRIVATE_KEY_B64` (veja como converter abaixo)
 7. **Compartilhe a planilha** do passo 1 com o e-mail da service account
    (o `client_email`), dando permissão de **Editor**. Sem esse passo o
    backend não consegue gravar nada.
+
+### Gerando o valor de `GOOGLE_PRIVATE_KEY_B64`
+
+Plataformas de deploy (Coolify incluído) costumam corromper quebras de linha
+(`\n`) dentro de variáveis de ambiente, o que quebra a chave privada e gera
+o erro `error:1E08010C:DECODER routines::unsupported`. Pra evitar isso,
+convertemos a chave inteira pra base64 (uma linha só, sem caracteres
+especiais) antes de colar no Coolify.
+
+Com o arquivo JSON da service account salvo localmente (ex: `key.json`), roda:
+
+```bash
+node -e "console.log(Buffer.from(require('./key.json').private_key).toString('base64'))"
+```
+
+Isso imprime uma linha longa em base64. Copia ela inteira e cola em
+`GOOGLE_PRIVATE_KEY_B64` no Coolify — sem aspas, sem quebras de linha.
+
+⚠️ Depois de gerar, **apague o `key.json` local** ou guarde ele num
+cofre de senhas — não deixe esse arquivo solto no disco nem em repositórios.
 
 ⚠️ Trate o arquivo `.json` da service account como um segredo — não commite
 ele no repositório, não cole em canais do Slack, e não deixe em texto puro
@@ -58,9 +78,8 @@ Abra `http://localhost:3000` e testa o formulário.
    detectar o `Dockerfile` na raiz do projeto automaticamente).
 3. Configure as **variáveis de ambiente** da aplicação no Coolify:
    - `GOOGLE_SERVICE_ACCOUNT_EMAIL`
-   - `GOOGLE_PRIVATE_KEY` (cole o valor com `\n` literal no lugar das quebras
-     de linha — é assim que vem no JSON original, então normalmente só
-     colar o valor de `private_key` já funciona)
+   - `GOOGLE_PRIVATE_KEY_B64` (o valor em base64 gerado no passo anterior —
+     essa é a forma recomendada, evita o erro de decodificação da chave)
    - `GOOGLE_SHEET_ID`
    - `GOOGLE_SHEET_TAB` (se quiser um nome diferente de `Respostas`)
 4. A porta exposta é `3000` (já configurada no Dockerfile via `EXPOSE`).
